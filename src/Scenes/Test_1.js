@@ -13,7 +13,8 @@ import * as Babylon_Components from "../Babylon_components";
 import * as XR_Module from "../Modules/XR_Module";
 import * as Gizmo from "../Modules/GizmoInterface";
 import "babylonjs-loaders";
-import Pyramid from "../Models/Pyramid.glb";
+
+import * as ModelsModule from "../Modules/ModelsModule";
 
 const onSceneReady = async (
   e = {
@@ -32,23 +33,45 @@ const onSceneReady = async (
   );
   Lights_Module.HemisphericLight(scene);
 
-  const pyramid = await BABYLON.SceneLoader.ImportMeshAsync(
-    "",
-    Pyramid,
-    "",
-    scene,
-    function (meshes) {
-        
+  var material = new BABYLON.StandardMaterial("material",scene);
+  material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+
+  var toonMaterial = new Materials_Module.ToonMaterial("toon", scene);
+
+  //make a white ground 
+  var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+  var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+  groundMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
+  ground.material = groundMaterial;
+  ground.position = new BABYLON.Vector3(0, -1, 0);
+
+  /*await BABYLON.SceneLoader.ImportMeshAsync("",Figures,"",scene).then((result => {
+    for(var i = 1; i < result.meshes.length; i++){
+      result.meshes[i].material = toonMaterial;
     }
-  );
+    result.meshes[1].position = new BABYLON.Vector3(1,0,0);
+    result.meshes[2].position = new BABYLON.Vector3(2,0,0);
+  }));*/
+
   
-  let pyramidMesh = pyramid.meshes[0];
-  const material = new BABYLON.StandardMaterial("material", scene);
-  material.diffuseColor = new BABYLON.Color3(0, 0, 1);
+  var pyramid = await ModelsModule.CreateCuadranguarPyramid();
 
-  pyramidMesh.material = material;
+  pyramid.material = material;
 
+  var cube = await ModelsModule.CreateCube();
 
+  cube.material = material;
+  cube.position = new BABYLON.Vector3(1,0,0);
+
+  var cylinder = await ModelsModule.CreateCylinder();
+
+  cylinder.material = material;
+  cylinder.position = new BABYLON.Vector3(2,0,0);
+  cylinder.scaling = new BABYLON.Vector3(1,1,1);
+
+  const box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
+
+  box.position = new BABYLON.Vector3(-3, 0, 0);
 
   const assetManager = new BABYLON.AssetsManager(scene);
   assetManager.load();
