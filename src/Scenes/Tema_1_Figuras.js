@@ -53,43 +53,6 @@ const onSceneReady = (e) => {
 
   torus.setAbsolutePosition(new BABYLON.Vector3(-6,1,0))
 
-  /*
-  const axesBox = new BABYLON.AxesViewer(scene,1)
-  xesBox.xAxis.parent = box;
-  axesBox.yAxis.parent = box;
-  axesBox.zAxis.parent = box;
-
-  */
-
-
-  /*
-  var groundMaterial = new MATERIALS.GridMaterial("groundmaterial", scene)
-	groundMaterial.majorUnitFrequency = 5;
-	groundMaterial.minorUnitVisibility = 0.45;
-	groundMaterial.gridRatio = 2;
-	groundMaterial.backFaceCulling = false;
-	groundMaterial.mainColor = new BABYLON.Color3(1, 1, 1);
-	groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-	groundMaterial.opacity = 0.98;
-
-  ground.material = groundMaterial;
-
-  */
-
-  /*
-	var skyMaterial = new MATERIALS.GridMaterial("skyMaterial", scene);
-	skyMaterial.majorUnitFrequency = 6;
-	skyMaterial.minorUnitVisibility = 0.43;
-	skyMaterial.gridRatio = 0.5;
-	skyMaterial.mainColor = new BABYLON.Color3(0, 0.05, 0.2);
-	skyMaterial.lineColor = new BABYLON.Color3(0, 1.0, 1.0);	
-	skyMaterial.backFaceCulling = false;
-	
-	var skySphere = BABYLON.Mesh.CreateSphere("skySphere", 30, 110, scene);
-	skySphere.material = skyMaterial;
-
-  */
-	
 
   scene.onBeforeRenderObservable.add(() =>{
     if (box !== undefined) {

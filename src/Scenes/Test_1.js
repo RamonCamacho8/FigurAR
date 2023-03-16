@@ -14,19 +14,24 @@ import * as Babylon_Components from "../Babylon_components"
 import * as XR_Module from "../Modules/XR_Module"
 import * as Gizmo from "../Modules/GizmoInterface"
 
-import ammo from "ammo.js"
+
 
 
 const onSceneReady = async (e = { engine: new BABYLON.Engine, scene: new BABYLON.Scene, canvas: new HTMLCanvasElement }) => {
 
-  const { canvas, scene, engine } = e;
+    const { canvas, scene, engine } = e;
+  
+    Cameras_Module.FreeCameraDefault(canvas, scene);
+    const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+    Lights_Module.HemisphericLight(scene);
 
-  Cameras_Module.FreeCameraDefault(canvas, scene);
+    const result = await BABYLON.SceneLoader.ImportMeshAsync("", "../Models", "Pyramid.gltf", scene);
 
-  Lights_Module.HemisphericLight(scene);
+    camera.target = result.meshes[0];
 
-};
-
+    console.log(result.meshes[0])
+  
+  };
 
 function Scene() {
   return (
