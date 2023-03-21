@@ -45,37 +45,39 @@ const onSceneReady = async (
   ground.material = groundMaterial;
   ground.position = new BABYLON.Vector3(0, -1, 0);
 
-  /*await BABYLON.SceneLoader.ImportMeshAsync("",Figures,"",scene).then((result => {
-    for(var i = 1; i < result.meshes.length; i++){
-      result.meshes[i].material = toonMaterial;
-    }
-    result.meshes[1].position = new BABYLON.Vector3(1,0,0);
-    result.meshes[2].position = new BABYLON.Vector3(2,0,0);
-  }));*/
+  
 
   
-  var pyramid = await ModelsModule.CreateCuadranguarPyramid();
-
-  pyramid.material = material;
-
-  var cube = await ModelsModule.CreateCube();
-
-  cube.material = material;
-  cube.position = new BABYLON.Vector3(1,0,0);
-
-  var cylinder = await ModelsModule.CreateCylinder();
-
-  cylinder.material = material;
-  cylinder.position = new BABYLON.Vector3(2,0,0);
-  cylinder.scaling = new BABYLON.Vector3(1,1,1);
-
-  const box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
-
-  box.position = new BABYLON.Vector3(-3, 0, 0);
-
   const assetManager = new BABYLON.AssetsManager(scene);
   assetManager.load();
+  
+  var angle = 5;
+  var sign = -1;
 
+  var prism = ModelsModule.CreateTriangleInsideSemiCircle("triangle", 170, scene);
+  prism.material = material;
+  
+  scene.onBeforeRenderObservable.add(() =>{
+    
+  
+
+    
+    /*if (angle==170) {
+      sign = -1*sign;
+    }
+    if (angle==5) {
+      sign = -1*sign;
+    }
+
+    prism = ModelsModule.CreateTriangleInsideSemiCircle("triangle", angle, scene);
+    prism.material = material;
+    angle += 1*sign;
+
+    console.log(angle);*/
+
+
+
+  });
  
 };
 
