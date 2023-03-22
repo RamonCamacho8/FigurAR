@@ -2,7 +2,7 @@ import { SceneLoader } from "babylonjs";
 import Figures from "../Models/Figures.glb";
 import * as BABYLON from "babylonjs";
 
-export async function CreateCuadranguarPyramid(){
+export async function CreatePyramid(){
 
     const {meshes} = await SceneLoader.ImportMeshAsync("Pyramid",Figures,"");
 
@@ -25,6 +25,31 @@ export async function CreateCylinder(){
     return meshes[1];
 
 }
+
+export async function CreateSphere(){
+
+    const {meshes} = await SceneLoader.ImportMeshAsync("Sphere",Figures,"");
+
+    return meshes[1];
+}
+
+export async function CreateWalls(){
+    
+        const {meshes} = await SceneLoader.ImportMeshAsync("Walls",Figures,"");
+    
+        return meshes[1];
+}
+
+export async function CreateGround(){
+
+    const {meshes} = await SceneLoader.ImportMeshAsync("Ground",Figures,"");
+
+    return meshes[1];
+
+}
+
+
+
 /** 
 * @param {string} name string name of the instanced material
 * @param {double} radius the radius of the prism

@@ -44,6 +44,34 @@ const onSceneReady = async (
   groundMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
   ground.material = groundMaterial;
   ground.position = new BABYLON.Vector3(0, -1, 0);
+  
+  var cubeMaterial = new BABYLON.StandardMaterial("cubeMaterial", scene);
+  cubeMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
+  var cube = ModelsModule.CreateCube();
+    
+  var sphereMaterial = new BABYLON.StandardMaterial("sphereMaterial", scene);
+  sphereMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
+  var sphere = ModelsModule.CreateSphere();
+
+  var cylinderMaterial = new BABYLON.StandardMaterial("cylinderMaterial", scene);
+  cylinderMaterial.diffuseColor = new BABYLON.Color3(1, 1, 0);
+  var cylinder = ModelsModule.CreateCylinder();
+
+  var pyramidMaterial = new BABYLON.StandardMaterial("pyramidMaterial", scene);
+  pyramidMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+  var pyramid = ModelsModule.CreatePyramid();
+
+  var wallsMaterial = new BABYLON.StandardMaterial("wallsMaterial", scene);
+  wallsMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
+  var walls = ModelsModule.CreateWalls();
+
+  cube.material = cubeMaterial;
+  sphere.material = sphereMaterial;
+  cylinder.material = cylinderMaterial;
+  pyramid.material = pyramidMaterial;
+  walls.material = wallsMaterial;
+
+
 
   
 
@@ -54,27 +82,9 @@ const onSceneReady = async (
   var angle = 5;
   var sign = -1;
 
-  var prism = ModelsModule.CreateTriangleInsideSemiCircle("triangle", 170, scene);
-  prism.material = material;
   
   scene.onBeforeRenderObservable.add(() =>{
     
-  
-
-    
-    /*if (angle==170) {
-      sign = -1*sign;
-    }
-    if (angle==5) {
-      sign = -1*sign;
-    }
-
-    prism = ModelsModule.CreateTriangleInsideSemiCircle("triangle", angle, scene);
-    prism.material = material;
-    angle += 1*sign;
-
-    console.log(angle);*/
-
 
 
   });
