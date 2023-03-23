@@ -48,12 +48,23 @@ export async function CreateGround(){
 
 }
 
+export async function CreateBoard(){
+
+    const {meshes} = await SceneLoader.ImportMeshAsync("Board",Figures,"");
+
+    return meshes[1];
+
+}
+
+
 
 
 /** 
 * @param {string} name string name of the instanced material
 * @param {double} radius the radius of the prism
 * @param {double} height the height of the prism
+* @param {double} side the height of the prism
+* @param {int} numOfFaces the height of the prism
 */
 export function CreatePrism(name,numOfFaces,scene,side,height){
     
@@ -67,30 +78,30 @@ export function CreatePrism(name,numOfFaces,scene,side,height){
         h = height;
 
     var angle = 2*Math.PI/numOfFaces;
-
+    
     var r = 1;
     if(side)
         r = side/(2*Math.sin(angle));
 
     var vertex = []
     vertex[numOfFaces] = [[r], [h/2], [r]]
-    for(var i = numOfFaces; i > 0; i--){
+    for(let i = numOfFaces; i > 0; i--){
         vertex[numOfFaces-i] = [[r*Math.cos(angle*i)], [h/2], [r*Math.sin(angle*i)]]
         vertex[numOfFaces*2-i] = [[r*Math.cos(angle*i)], [-h/2], [r*Math.sin(angle*i)]]
     }
     //Makes the faces from the vertex's
     var faces = []
-    for(var i = 1; i <= numOfFaces; i++){
+    for(let i = 1; i <= numOfFaces; i++){
         //Clockwise
         //faces[i-1] = [i%numOfFaces, (i%numOfFaces)+numOfFaces, i+numOfFaces-1, i-1]
         //Counter-Clockwise
         faces[i-1] = [ i-1, i+numOfFaces-1,(i%numOfFaces)+numOfFaces,i%numOfFaces]
     }
     
-    for(var i = 0; i < 2; i++){
-        var temp = []
-        for(var j = 0; j < numOfFaces; j++){
-            if(i == 0)
+    for(let i = 0; i < 2; i++){
+        let temp = []
+        for(let j = 0; j < numOfFaces; j++){
+            if(i === 0)
                 temp[j] = j+(i)*numOfFaces
             else
                 temp[j] = numOfFaces*2-j-1
@@ -125,23 +136,23 @@ export function createRegularPolygon(name,numOfFaces,scene,side){
 
     var vertex = []
     vertex[numOfFaces] = [[r], [h/2], [r]]
-    for(var i = numOfFaces; i > 0; i--){
+    for(let i = numOfFaces; i > 0; i--){
         vertex[numOfFaces-i] = [[r*Math.cos(angle*i)], [h/2], [r*Math.sin(angle*i)]]
         vertex[numOfFaces*2-i] = [[r*Math.cos(angle*i)], [-h/2], [r*Math.sin(angle*i)]]
     }
     //Makes the faces from the vertex's
     var faces = []
-    for(var i = 1; i <= numOfFaces; i++){
+    for(let i = 1; i <= numOfFaces; i++){
         //Clockwise
         //faces[i-1] = [i%numOfFaces, (i%numOfFaces)+numOfFaces, i+numOfFaces-1, i-1]
         //Counter-Clockwise
         faces[i-1] = [ i-1, i+numOfFaces-1,(i%numOfFaces)+numOfFaces,i%numOfFaces]
     }
     
-    for(var i = 0; i < 2; i++){
+    for(let i = 0; i < 2; i++){
         var temp = []
         for(var j = 0; j < numOfFaces; j++){
-            if(i == 0)
+            if(i === 0)
                 temp[j] = j+(i)*numOfFaces
             else
                 temp[j] = numOfFaces*2-j-1
@@ -199,10 +210,10 @@ export function CreateTriangleInsideSemiCircle(name, ang, scene){
         faces[i-1] = [i-1, i+sides-1,(i%sides)+sides,i%sides]
     }
 
-    for(var i = 0; i < 2; i++){
+    for(let i = 0; i < 2; i++){
         var temp = []
         for(var j = 0; j < sides; j++){
-            if(i == 0)
+            if(i === 0)
                 temp[j] = j
             else
                 temp[j] = sides*2-j-1

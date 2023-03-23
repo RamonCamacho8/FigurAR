@@ -3,6 +3,7 @@ import React from "react";
 import * as BABYLON from "babylonjs";
 import * as MATERIALS from "babylonjs-materials"
 import SceneComponent from "../Babylon_components/SceneComponent"; 
+import "babylonjs-loaders";
 // import SceneComponent from 'babylonjs-hook'; // if you install 'babylonjs-hook' NPM.
 
 

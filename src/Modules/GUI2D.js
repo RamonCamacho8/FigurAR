@@ -385,7 +385,7 @@ export function GUI2D(scene) {
     endRound.linkWithMesh(sphere7);
 
     // Plane
-    var plane = BABYLON.Mesh.CreatePlane("plane", 20);
+    var plane = BABYLON.MeshBuilder.CreatePlane("plane", {width: 20, height: 20}, scene);
     plane.parent = sphere4;
     plane.position.y = -10;
 

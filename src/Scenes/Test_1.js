@@ -1,20 +1,12 @@
-import React from "react";
 import * as BABYLON from "babylonjs";
 import * as MATERIALS from "babylonjs-materials";
+import * as GUI from "babylonjs-gui";
 import SceneComponent from "../Babylon_components/SceneComponent";
-// import SceneComponent from 'babylonjs-hook'; // if you install 'babylonjs-hook' NPM.
-
-import * as Cameras_Module from "../Modules/Cameras_Module";
-import * as Lights_Module from "../Modules/Lights_Module";
-import * as Materials_Module from "../Modules/Materials_Module";
-
-import * as Babylon_Components from "../Babylon_components";
-
-import * as XR_Module from "../Modules/XR_Module";
-import * as Gizmo from "../Modules/GizmoInterface";
-import "babylonjs-loaders";
 
 import * as ModelsModule from "../Modules/ModelsModule";
+
+import { GizmoInterface } from "../Modules/GizmoInterface";
+import "babylonjs-loaders";
 
 const onSceneReady = async (
   e = {
@@ -25,70 +17,129 @@ const onSceneReady = async (
 ) => {
   const { canvas, scene, engine } = e;
 
-  Cameras_Module.FreeCameraDefault(canvas, scene);
-  const camera = new BABYLON.FreeCamera(
+  // This creates and positions a free camera (non-mesh)
+  var camera = new BABYLON.FreeCamera(
     "camera1",
     new BABYLON.Vector3(0, 5, -10),
     scene
   );
-  Lights_Module.HemisphericLight(scene);
+  //const camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, 0, new BABYLON.Vector3(2, 3, 4), scene);
 
-  var material = new BABYLON.StandardMaterial("material",scene);
-  material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+  // This targets the camera to scene origin
+  camera.setTarget(BABYLON.Vector3.Zero());
+  //camera.setPosition(new BABYLON.Vector3(10, 3, -10))
 
-  var toonMaterial = new Materials_Module.ToonMaterial("toon", scene);
+  // This attaches the camera to the canvass
+  camera.attachControl(canvas, false);
 
-  //make a white ground 
-  var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-  var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
-  groundMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
-  ground.material = groundMaterial;
-  ground.position = new BABYLON.Vector3(0, -1, 0);
+  //scene.clearColor = new BABYLON.Color3(0, 0, 0);
+
+  var light = new BABYLON.HemisphericLight(
+    "light",
+    new BABYLON.Vector3(0, 1, 0),
+    scene
+  );
+  light.intensity = 0.7;
+
+  // GUI
+
+  GizmoInterface(scene);
   
-  var cubeMaterial = new BABYLON.StandardMaterial("cubeMaterial", scene);
-  cubeMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
-  var cube = ModelsModule.CreateCube();
-    
-  var sphereMaterial = new BABYLON.StandardMaterial("sphereMaterial", scene);
-  sphereMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
-  var sphere = ModelsModule.CreateSphere();
-
-  var cylinderMaterial = new BABYLON.StandardMaterial("cylinderMaterial", scene);
-  cylinderMaterial.diffuseColor = new BABYLON.Color3(1, 1, 0);
-  var cylinder = ModelsModule.CreateCylinder();
-
-  var pyramidMaterial = new BABYLON.StandardMaterial("pyramidMaterial", scene);
-  pyramidMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-  var pyramid = ModelsModule.CreatePyramid();
-
-  var wallsMaterial = new BABYLON.StandardMaterial("wallsMaterial", scene);
-  wallsMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
-  var walls = ModelsModule.CreateWalls();
-
-  cube.material = cubeMaterial;
-  sphere.material = sphereMaterial;
-  cylinder.material = cylinderMaterial;
-  pyramid.material = pyramidMaterial;
-  walls.material = wallsMaterial;
-
-
+  var cylinder = ModelsModule.CreateCylinder("cylinder", 4, scene,1,1);
+  var cube = await ModelsModule.CreateCube("cube", 4, scene,1,1);
+  var sphere = await ModelsModule.CreateSphere("sphere", 4, scene,1,1);
+  var pyramid = await ModelsModule.CreatePyramid("pyramid", 4, scene,1,1);
+  var board = await ModelsModule.CreateBoard("board", 4, scene,1,1);
+  ModelsModule.CreateWalls();
+  ModelsModule.CreateGround();
 
   
 
-  
-  const assetManager = new BABYLON.AssetsManager(scene);
-  assetManager.load();
-  
-  var angle = 5;
-  var sign = -1;
+  // GUI
+  var meshGUI = BABYLON.MeshBuilder.CreatePlane(
+    "plane",
+    {
+      width: 1 * 1.8,
+      height: 1,
+      sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+    },
+    scene
+  );
 
-  
-  scene.onBeforeRenderObservable.add(() =>{
-    
+  meshGUI.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+  var meshGUI_2 = BABYLON.MeshBuilder.CreatePlane(
+    "plane_2",
+    {
+      width: 1 * 1.8,
+      height: 1,
+      sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+    },
+    scene
+  );
+
+  meshGUI_2.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+  var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI);
+  var advancedTexture_2 = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI_2);
+
+  var container = new GUI.Rectangle("container");
+  container.width = 1;
+  container.height = 1;
+  container.thickness = 0;
+  container.background = "white";
+  container.alpha = 0.05;
+  container.zIndex = -1;
+
+  var container_2 = new GUI.Rectangle("container2");
+  container.width = 1;
+  container.height = 1;
+  container.thickness = 0;
+  container.background = "white";
+  container.alpha = 0.05;
+  container.zIndex = -1;
+
+  advancedTexture.addControl(container);
+  advancedTexture.scaleTo(300, 150);
+  advancedTexture_2.addControl(container_2);
+  advancedTexture_2.scaleTo(300, 150);
 
 
+  var button1 = GUI.Button.CreateSimpleButton("but1", "Cilindro\n Ramon");
+  button1.color = "white";
+  button1.fontSize = 28;
+  button1.background = "green";
+  button1.onPointerUpObservable.add(function () {
+    alert("Lo hiciste!");
   });
- 
+
+
+  var button2 = GUI.Button.CreateSimpleButton("but2", "Cubo\n Ramon");
+  button2.color = "white";
+  button2.fontSize = 28;
+  button2.background = "green";
+  button2.onPointerUpObservable.add(function () {
+    alert("Lo hiciste!");
+  });
+
+  advancedTexture.addControl(button1);
+  advancedTexture_2.addControl(button2);
+
+  meshGUI_2.parent = cube;
+  meshGUI_2.position = new BABYLON.Vector3(0, -2, 0);
+  let angle_2 = 90;
+  meshGUI_2.rotation = new BABYLON.Vector3(angle_2*Math.PI / 2, 0, 0);
+
+  meshGUI.parent = await cylinder;
+  meshGUI.position = new BABYLON.Vector3(0, -2, 0);
+  let angle = 90;
+  meshGUI.rotation = new BABYLON.Vector3(angle*Math.PI / 2, 0, 0);
+
+  engine.runRenderLoop(() => {
+    if (scene) {
+      scene.render();
+    }
+  });
 };
 
 
