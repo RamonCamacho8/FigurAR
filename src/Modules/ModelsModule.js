@@ -1,6 +1,7 @@
 import { SceneLoader } from "babylonjs";
 import Figures from "../Models/Figures.glb";
 import * as BABYLON from "babylonjs";
+import earcut from "earcut";
 
 export async function CreatePyramid(){
 
@@ -184,56 +185,62 @@ export function createRegularPolygon(name,numOfFaces,scene,side){
 */
 
 export function CreateTriangleInsideSemiCircle(name, ang, scene){
-    var sides = 3;
+   
     var angle = Math.PI /2;
     var radius = 1;
-    var height = .005;
+;
     //ang to rad
     if(ang)
         angle = ang * Math.PI / 180;
 
-    var vertex = []
+    var vertex = [
+        new BABYLON.Vector3(0, 0, -radius),
+        new BABYLON.Vector3(radius*Math.sin(angle), 0, radius*Math.cos(angle)),
+        new BABYLON.Vector3(0, 0, radius)
+    ]
 
-    vertex[0] = [[0], [height/2], [-radius]]
-    vertex[1] = [[0], [height/2], [radius]]
-    vertex[2] = [[radius*Math.sin(angle)], [height/2], [radius*Math.cos(angle)]]
-    
-    vertex[3] = [[0], [-height/2], [-radius]]
-    vertex[4] = [[0], [-height/2], [radius]]
-    vertex[5] = [[radius*Math.sin(angle)], [-height/2], [radius*Math.cos(angle)]]
+    console.table(vertex);
 
-    var faces = []
-    for(var i = 1; i <= sides; i++){
-        //Clockwise
-        //faces[i-1] = [i%numOfFaces, (i%numOfFaces)+numOfFaces, i+numOfFaces-1, i-1]
-        //Counter-Clockwise
-        faces[i-1] = [i-1, i+sides-1,(i%sides)+sides,i%sides]
-    }
+    let options = {
 
-    for(let i = 0; i < 2; i++){
-        var temp = []
-        for(var j = 0; j < sides; j++){
-            if(i === 0)
-                temp[j] = j
-            else
-                temp[j] = sides*2-j-1
-        }
-        faces[sides+i] = temp
-    }
+        sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+        shape:vertex, 
+        updatable: true
 
-    var heptagonalPrism = { 
-        "name":"Heptagonal Prism", 
-        "category":["Prism"], 
-        "vertex":vertex,
-        "face":faces
     };
 
-    var prism = BABYLON.MeshBuilder.CreatePolyhedron(name, {custom:heptagonalPrism}, scene);
-
-    //console.table(vertex);
-    //console.table(faces);
+    let polygon = BABYLON.MeshBuilder.CreatePolygon(name, options, scene,earcut);
     
-
-    return prism;
+    return polygon;
 }
 
+export function UpdateTriangleAngle(mesh, ang){
+   
+    var angle = ang * Math.PI /180;
+    var data = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+
+    //pick first half of vertices data
+    var data1 = data.slice(0, data.length/2);
+
+    let vertex = []
+
+    for (let i = 0; i < data1.length; i+=3) {
+        vertex.push(new BABYLON.Vector3(data1[i], data1[i+1], data1[i+2]))
+    }
+
+    vertex[1] =  new BABYLON.Vector3(1*Math.sin(angle), 0, 1*Math.cos(angle))
+
+    //unwrawp vertices data from Vector3 to array
+    let vertexData = []
+    for (let i = 0; i < vertex.length; i++) {
+        vertexData[i*3] = vertex[i].x
+        vertexData[i*3+1] = vertex[i].y
+        vertexData[i*3+2] = vertex[i].z
+    }
+
+    //concatenate vertex data
+    vertexData = vertexData.concat(vertexData);
+
+    mesh.updateVerticesData(BABYLON.VertexBuffer.PositionKind, vertexData, false, false);
+
+}

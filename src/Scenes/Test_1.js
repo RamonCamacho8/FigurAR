@@ -2,6 +2,8 @@ import * as BABYLON from "babylonjs";
 import * as MATERIALS from "babylonjs-materials";
 import * as GUI from "babylonjs-gui";
 import SceneComponent from "../Babylon_components/SceneComponent";
+import earcut from "earcut";
+
 
 import * as ModelsModule from "../Modules/ModelsModule";
 
@@ -20,9 +22,11 @@ const onSceneReady = async (
   // This creates and positions a free camera (non-mesh)
   var camera = new BABYLON.FreeCamera(
     "camera1",
-    new BABYLON.Vector3(0, 5, -10),
+    new BABYLON.Vector3(0, 2, 0),
     scene
   );
+
+
   //const camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, 0, new BABYLON.Vector3(2, 3, 4), scene);
 
   // This targets the camera to scene origin
@@ -45,15 +49,16 @@ const onSceneReady = async (
 
   GizmoInterface(scene);
   
-  var cylinder = ModelsModule.CreateCylinder("cylinder", 4, scene,1,1);
+  var cylinder = await ModelsModule.CreateCylinder("cylinder", 4, scene,1,1);
   var cube = await ModelsModule.CreateCube("cube", 4, scene,1,1);
   var sphere = await ModelsModule.CreateSphere("sphere", 4, scene,1,1);
   var pyramid = await ModelsModule.CreatePyramid("pyramid", 4, scene,1,1);
   var board = await ModelsModule.CreateBoard("board", 4, scene,1,1);
   ModelsModule.CreateWalls();
   ModelsModule.CreateGround();
-
   
+
+  scene.debugLayer.show();
 
   // GUI
   var meshGUI = BABYLON.MeshBuilder.CreatePlane(
@@ -82,6 +87,7 @@ const onSceneReady = async (
 
   var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI);
   var advancedTexture_2 = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI_2);
+  
 
   var container = new GUI.Rectangle("container");
   container.width = 1;
@@ -105,18 +111,18 @@ const onSceneReady = async (
   advancedTexture_2.scaleTo(300, 150);
 
 
-  var button1 = GUI.Button.CreateSimpleButton("but1", "Cilindro\n Ramon");
+  var button1 = GUI.Button.CreateSimpleButton("but1", "Cilindro\n Su volumen se calcula con la formula: \n V = π*radio^2*altura");
   button1.color = "white";
-  button1.fontSize = 28;
+  button1.fontSize = 20;
   button1.background = "green";
   button1.onPointerUpObservable.add(function () {
     alert("Lo hiciste!");
   });
 
 
-  var button2 = GUI.Button.CreateSimpleButton("but2", "Cubo\n Ramon");
+  var button2 = GUI.Button.CreateSimpleButton("but2", "Cubo\n Todas sus caras son cuadradas y sus aristas son iguales. \n Su volumen se calcula con la formula: \n V = lado^3");
   button2.color = "white";
-  button2.fontSize = 28;
+  button2.fontSize = 20;
   button2.background = "green";
   button2.onPointerUpObservable.add(function () {
     alert("Lo hiciste!");
@@ -135,12 +141,54 @@ const onSceneReady = async (
   let angle = 90;
   meshGUI.rotation = new BABYLON.Vector3(angle*Math.PI / 2, 0, 0);
 
+  
+ 
+	
+  
+
+  var deltaTimeInSeconds = 0;
+  var angleTriangle = 5;
+  var sign = 1;
+  var triangle = ModelsModule.CreateTriangleInsideSemiCircle("Triangle", angleTriangle, scene)
+  triangle.position = new BABYLON.Vector3(0, 0, -.5);
+  triangle.material = new BABYLON.StandardMaterial("material", scene);
+  triangle.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
+
+  camera.target = board.position;
+  
+  triangle.rotate(BABYLON.Axis.Y,90*Math.PI/180, BABYLON.Space.LOCAL);
+  triangle.rotate(BABYLON.Axis.Z,90*Math.PI/180, BABYLON.Space.LOCAL);
+
+ 
+
+  triangle.parent = board;
+  scene.onBeforeRenderObservable.add(() =>{
+    if (triangle !== undefined) {
+
+      deltaTimeInSeconds += scene.getEngine().getDeltaTime()/1000;
+      if(deltaTimeInSeconds >= .1){
+        ModelsModule.UpdateTriangleAngle(triangle, angleTriangle)
+        angleTriangle += 1*sign;  
+        deltaTimeInSeconds = 0;
+        if(angleTriangle >= 175 || angleTriangle <= 5)
+          sign = sign*(-1);
+
+      } 
+  
+       
+    } 
+
+  });
+
   engine.runRenderLoop(() => {
     if (scene) {
       scene.render();
     }
   });
+
 };
+
+
 
 
 
