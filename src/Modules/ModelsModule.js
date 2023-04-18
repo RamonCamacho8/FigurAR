@@ -114,17 +114,6 @@ export function CreateFloatingPanel(mesh,scene, panelText, imported){
   meshGUI.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
   let advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI);
 
-  let container = new GUI.Rectangle("container");
-  container.width = 1;
-  container.height = 1;
-  container.thickness = 0;
-  container.background = "white";
-  container.alpha = 0.05;
-  container.zIndex = -1;
-
-  advancedTexture.addControl(container);
-  advancedTexture.scaleTo(300, 150);
-
   let button = GUI.Button.CreateSimpleButton("but1", panelText);
   button.color = "white";
   button.fontSize = 20;
@@ -134,6 +123,8 @@ export function CreateFloatingPanel(mesh,scene, panelText, imported){
   });
 
   advancedTexture.addControl(button);
+  advancedTexture.scaleTo(300, 150);
+
 
   meshGUI.parent =  mesh;
   meshGUI.position = new BABYLON.Vector3(0, -2, 0);
@@ -144,7 +135,7 @@ export function CreateFloatingPanel(mesh,scene, panelText, imported){
         meshGUI.rotation = new BABYLON.Vector3(angle*Math.PI / 2, 0, 0);
     }
 
-    return {meshGUI, advancedTexture, container, button};
+    
 }
 
 export function CreateFloatingSlider(mesh, scene, panelText, imported) {
@@ -158,7 +149,6 @@ export function CreateFloatingSlider(mesh, scene, panelText, imported) {
     },
     scene
   );
-
   meshGUI.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
   let advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI);
 
@@ -191,7 +181,7 @@ export function CreateFloatingSlider(mesh, scene, panelText, imported) {
   slider.width = "200px";
 
   let information = new GUI.TextBlock();
-  information.text = "A: 90° \n B: 90° \n C: 90°";
+  information.text = "Lados: \n A: --- \n B: --- \n C: ---";
   information.height = "150px";
   information.color = "white";
 
@@ -213,13 +203,14 @@ export function CreateFloatingSlider(mesh, scene, panelText, imported) {
     let y2 = 0;
     let x3 = 1*Math.cos(value* Math.PI /180);
     let y3 = 1*Math.sin(value* Math.PI /180);
+
     
     let b = Math.sqrt(Math.pow(x3-x1,2)+Math.pow(y3-y1,2));
     let c = Math.sqrt(Math.pow(x3-x2,2)+Math.pow(y3-y2,2));
 
     
     header.text = "Angulo: " + value + "°";
-    information.text = "A: "+a.toPrecision(4)+" \n B: "+b.toPrecision(4)+" \n C: "+c.toPrecision(4)+"";
+    information.text = "Lados: \n A: "+a.toPrecision(4)+" \n B: "+b.toPrecision(4)+" \n C: "+c.toPrecision(4)+"";
 
     if (mesh) {
       //cast to int
@@ -228,9 +219,6 @@ export function CreateFloatingSlider(mesh, scene, panelText, imported) {
   });
 
   
-
-  
-
   advancedTexture.addControl(grid);
   panel.addControl(header);
   panel.addControl(slider);
@@ -247,9 +235,6 @@ export function CreateFloatingSlider(mesh, scene, panelText, imported) {
     meshGUI.rotation = new BABYLON.Vector3((angle * Math.PI) / 2, 0, 0);
   }
 }
-
-
-
 
 /** 
 * @param {string} name string name of the instanced material
@@ -315,7 +300,7 @@ export function CreatePrism(name,numOfFaces,scene,side,height){
     return prism;
 }
 
-export function createRegularPolygon(name,numOfFaces,scene,side){
+export function CreateRegularPolygon(name,numOfFaces,scene,side){
     if(numOfFaces < 3)
         numOfFaces = 3;
 
@@ -374,7 +359,6 @@ export function createRegularPolygon(name,numOfFaces,scene,side){
 * @param {int} ang the angle of the triangle
 * @param {double} height the height of the prism
 */
-
 export function CreateTriangleInsideSemiCircle(name, ang, scene){
    
     var angle = Math.PI /2;

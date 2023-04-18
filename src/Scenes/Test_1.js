@@ -1,9 +1,6 @@
 import * as BABYLON from "babylonjs";
-import * as MATERIALS from "babylonjs-materials";
-import * as GUI from "babylonjs-gui";
 import SceneComponent from "../Babylon_components/SceneComponent";
-import earcut from "earcut";
-
+import * as XR from "../Modules/XR_Module";
 
 import * as ModelsModule from "../Modules/ModelsModule";
 
@@ -31,6 +28,14 @@ const onSceneReady = async (
   // Camera
   ModelsModule.CreateController(scene);
 
+  //SkyBox
+  const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 100.0 }, scene);
+  const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+  skyboxMaterial.backFaceCulling = false;
+  skyboxMaterial.disableLighting = true;
+  skybox.material = skyboxMaterial;
+
+  
   // GUI
   GizmoInterface(scene);
   
@@ -41,9 +46,12 @@ const onSceneReady = async (
   var board = await ModelsModule.CreateBoard();
 
   ModelsModule.CreateWalls();
-  ModelsModule.CreateGround();
-  
+  var ground = ModelsModule.CreateGround();
 
+  //XR
+  await XR.XR_Experience(ground, skybox, scene);
+  
+  // Debug layer
   scene.debugLayer.show();
 
   // GUI
@@ -52,10 +60,8 @@ const onSceneReady = async (
   ModelsModule.CreateFloatingPanel(sphere, scene, "Sphere", true);
   ModelsModule.CreateFloatingPanel(pyramid, scene, "Pyramid", true);
 
-  var deltaTimeInSeconds = 0;
-  var angleTriangle = 5;
-  var sign = 1;
-  var triangle = ModelsModule.CreateTriangleInsideSemiCircle("Triangle", angleTriangle, scene)
+
+  var triangle = ModelsModule.CreateTriangleInsideSemiCircle("Triangle", 90, scene)
 
   ModelsModule.CreateFloatingSlider(triangle, scene, "Pyramid", true);
 
