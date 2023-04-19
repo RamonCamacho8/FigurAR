@@ -1,5 +1,6 @@
 import { HemisphericLight, Scene, SceneLoader } from "babylonjs";
 import Figures from "../Models/Figures.glb";
+import Enviroment from "../Models/FigurarEnviroment.glb";
 import * as BABYLON from "babylonjs";
 import earcut from "earcut";
 import * as GUI from "babylonjs-gui";
@@ -13,12 +14,63 @@ export async function CreatePyramid(){
 
 }
 
+export async function CreateEnviroment(){
+
+    const {meshes} = await SceneLoader.ImportMeshAsync("",Enviroment,"");
+
+    return meshes;
+}
+
+
 export async function CreateCube(){
 
     const {meshes} = await SceneLoader.ImportMeshAsync("Cube",Figures,"");
 
+
+    
+
     return meshes[1];
 
+}
+
+
+export function CreateAnimation(mesh, scene){
+
+    const frameRate = 10;
+    // Define the rotation axis and angle
+    const rotationAxis = new BABYLON.Vector3(0, 1, 1);
+    const rotationAngle = Math.PI; // 90 degrees
+    
+    const keyFrames = [];
+
+    keyFrames.push({
+        frame: 0,
+        value: mesh.rotationQuaternion.clone() // Starting rotation
+    });
+    keyFrames.push({
+        frame: frameRate, // Duration of animation (in frames)
+        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
+    });
+
+    keyFrames.push({
+        frame: frameRate*2, // Duration of animation (in frames)
+        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle*2).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
+    });
+
+    const rotateAnimation = new BABYLON.Animation(
+        "rotateAnimation",
+        "rotationQuaternion",
+        frameRate, // Frames per second
+        BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE // Loop the animation
+    );
+
+    rotateAnimation.setKeys(keyFrames);
+
+
+    mesh.animations.push(rotateAnimation);
+
+    scene.beginAnimation(mesh, 0, 2 * frameRate, true);
 }
 
 export async function CreateCylinder(){
@@ -85,7 +137,7 @@ export function CreateController(scene){
     const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1.7, 0), scene);
     camera.attachControl();
     camera.checkCollisions = true;
-    camera.applyGravity = true;
+    //camera.applyGravity = true;
     camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
     camera.speed = 0.5;
     camera.minZ = 0.45;
