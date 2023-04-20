@@ -1,7 +1,5 @@
 import * as BABYLON from "babylonjs";
 import SceneComponent from "../Babylon_components/SceneComponent";
-import * as XR from "../Modules/XR_Module";
-
 import * as Modules from "../Modules/Modules";
 
 import { GizmoInterface } from "../Modules/GizmoInterface";
@@ -27,51 +25,53 @@ const onSceneReady = async (
 
   // Camera
   Modules.CreateController(scene);
-
-  //SkyBox
-  const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 100.0 }, scene);
-  const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-  skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.disableLighting = true;
-  skybox.material = skyboxMaterial;
-
   
-  // GUI
-  GizmoInterface(scene);
+  //Lights
+  const light = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(1, 10, 1), scene);
+  light.intensity = 2;
+  light.diffuse = new BABYLON.Color3(1, 1, 1);
+  //GizmoInterface(scene);
   
   await Modules.CreateEnviroment();
 
   //Get mesh by name
-  const circle =  scene.getMeshByName("Circle");
-  const triangle =  scene.getMeshByName("Triangle");
-  const square =  scene.getMeshByName("Square");
+  const circle =  scene.getMeshByName("Room_1_Circle");
+  const triangle =  scene.getMeshByName("Room_1_Triangle");
+  const square =  scene.getMeshByName("Room_1_Square");
 
-  const squareL = scene.getMeshByName("Square_L");
-  const circleL = scene.getMeshByName("Circle_L");
-  const triangleL = scene.getMeshByName("Triangle_L");
+  const squareL = scene.getMeshByName("Room_1_Square_L");
+  const circleL = scene.getMeshByName("Room_1_Circle_L");
+  const triangleL = scene.getMeshByName("Room_1_Triangle_L");
 
-  const lock = scene.getMeshByName("Locker");
+  const lock = scene.getMeshByName("Room_1_Locker");
+
+  const door = scene.getMeshByName("Room_1_Door");
+
+  const roof = scene.getMeshByName("Room_1_Roof");
+  const lightBulb = scene.getMeshByName("Room_1_LightBulb");
+
+  
+
+  light.position = lightBulb.position-.5;
+  lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+  
+  //roof.dispose();
 
   //Set infoPanels
-
   Modules.CreateInfoPanel(square,scene,"--Cuadrado-- \n Un Cuadrado tiene 4 lados.",false);
   Modules.CreateInfoPanel(triangle,scene,"--Triangulo-- \n Un Triangulo tiene 3 lados.",false);
   Modules.CreateInfoPanel(circle,scene,"--Circulo-- \n Un Circulo sólo tiene un lado. ",false);
-
   Modules.CreateInfoPanel(lock,scene,"¿Qué forma tiene esta habitación?",false,true);
 
 
 
   //Set PressAnimations 
-
-
- 
-
-  Modules.MakePressProccess(squareL,scene);
+  Modules.MakePressProccess(squareL,scene, door);
   Modules.MakePressProccess(circleL,scene);
   Modules.MakePressProccess(triangleL,scene);
 
 
+ 
 
   // Debug layer
   scene.debugLayer.show();

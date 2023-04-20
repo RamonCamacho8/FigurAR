@@ -18,27 +18,29 @@ export async function CreateEnviroment(){
     return meshes;
 }
 
-export function MakePressProccess(mesh, scene, id){
+export function MakePressProccess(mesh, scene, doorMesh){
     mesh.actionManager = new BABYLON.ActionManager(scene);
 
 
     mesh.edgesWidth = 1.0;
     mesh.edgesColor = new BABYLON.Color4(0, 0, 0, 1);   
     
-    let frameRate = setPressAnimation(mesh, id)
+    let frameRate = setPressAnimation(mesh)
 
 
     mesh.actionManager.registerAction(new BABYLON.PlaySoundAction(
-        BABYLON.ActionManager.OnPickDownTrigger,new BABYLON.Sound("down" + id, buttonSound, scene)));
+        BABYLON.ActionManager.OnPickDownTrigger,new BABYLON.Sound("down", buttonSound, scene)));
 
     mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnLeftPickTrigger,
         function (evt) {
-            // This code will be executed when the mesh is clicked
-            console.log("Mesh clicked!"  + id);
             scene.beginAnimation(mesh, 0,frameRate);
-
-            
+            console.log(mesh.name)
+            if(doorMesh){
+                console.log("Correcto"+doorMesh.name);
+                doorMesh.isVisible = false;
+                doorMesh.checkCollisions = false;
+            }
         }
     ));
 
@@ -59,9 +61,43 @@ export function MakePressProccess(mesh, scene, id){
 
         }
     ));
+}
+
+function doorAnimation(meshs,scene){
+    const frameRate = 10;
+    const rotationAxis = new BABYLON.Vector3(0, 1, 1);
+    const rotationAngle = Math.PI; // 90 degrees
+    
+    const keyFrames = [];
+
+    keyFrames.push({
+        frame: 0,
+        value: mesh.rotationQuaternion.clone() // Starting rotation
+    });
+    keyFrames.push({
+        frame: frameRate, // Duration of animation (in frames)
+        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
+    });
+
+    keyFrames.push({
+        frame: frameRate*2, // Duration of animation (in frames)
+        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle*2).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
+    });
+
+    const rotateAnimation = new BABYLON.Animation(
+        "rotateAnimation",
+        "rotationQuaternion",
+        frameRate, // Frames per second
+        BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE // Loop the animation
+    );
+
+    rotateAnimation.setKeys(keyFrames);
 
 
+    mesh.animations.push(rotateAnimation);
 
+    scene.beginAnimation(mesh, 0, 2 * frameRate, true);
 }
 
 function setPressAnimation(mesh,id){
@@ -143,43 +179,13 @@ export function MakeRotationAnimation(mesh, scene){
     scene.beginAnimation(mesh, 0, 2 * frameRate, true);
 }
 
-export async function CreateCylinder(){
-
-    const {meshes} = await SceneLoader.ImportMeshAsync("Cylinder",Figures,"");
-
-    return meshes[1];
-
-}
-
-export async function CreateSphere(){
-
-    const {meshes} = await SceneLoader.ImportMeshAsync("Sphere",Figures,"");
-
-    return meshes[1];
-}
-
-export async function CreateWalls(){
-    
-        const {meshes} = await SceneLoader.ImportMeshAsync("Walls",Figures,"");
-        meshes.map((mesh) => {
-            mesh.checkCollisions = true;
-        })
-        return meshes[1];
-}
-
-export async function CreateGround(){
-
-    const {meshes} = await SceneLoader.ImportMeshAsync("Ground",Figures,"");
-    meshes.map((mesh) => {
-        mesh.checkCollisions = true;
-    })
-    return meshes[1];
-
-}
-
+/**
+ * 
+ * @param {Scene} scene Scene
+ */
 export async function SetupScene(scene){
     
-    new HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+    //new HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 
     const frameRate = 60;
     const gravity = -9.81;
@@ -188,7 +194,6 @@ export async function SetupScene(scene){
     scene.collitionsEnabled = true;
 
 }
-
 
 /**
  *
@@ -199,8 +204,8 @@ export function CreateController(scene){
     const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1, 0), scene);
     camera.attachControl();
     camera.checkCollisions = true;
-    camera.applyGravity = true;
-    camera.ellipsoid = new BABYLON.Vector3(.5, .5, .5);
+    camera.applyGravity = false;
+    camera.ellipsoid = new BABYLON.Vector3(.25, .5, .25);
     camera.speed = 0.1;
     camera.minZ = 0.45;
     camera.angularSensibility = 4000;
