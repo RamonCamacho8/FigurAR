@@ -2,7 +2,7 @@ import * as BABYLON from "babylonjs";
 import SceneComponent from "../Babylon_components/SceneComponent";
 import * as XR from "../Modules/XR_Module";
 
-import * as ModelsModule from "../Modules/ModelsModule";
+import * as Modules from "../Modules/Modules";
 
 import { GizmoInterface } from "../Modules/GizmoInterface";
 import "babylonjs-loaders";
@@ -23,10 +23,10 @@ const onSceneReady = async (
 
 
   // Setup scene
-  ModelsModule.SetupScene(scene);
+  Modules.SetupScene(scene);
 
   // Camera
-  ModelsModule.CreateController(scene);
+  Modules.CreateController(scene);
 
   //SkyBox
   const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 100.0 }, scene);
@@ -39,12 +39,39 @@ const onSceneReady = async (
   // GUI
   GizmoInterface(scene);
   
-  await ModelsModule.CreateEnviroment();
+  await Modules.CreateEnviroment();
 
   //Get mesh by name
-  const mesh =  scene.getMeshByName("Floor");
+  const circle =  scene.getMeshByName("Circle");
+  const triangle =  scene.getMeshByName("Triangle");
+  const square =  scene.getMeshByName("Square");
 
-  mesh.position.x = 2;
+  const squareL = scene.getMeshByName("Square_L");
+  const circleL = scene.getMeshByName("Circle_L");
+  const triangleL = scene.getMeshByName("Triangle_L");
+
+  const lock = scene.getMeshByName("Locker");
+
+  //Set infoPanels
+
+  Modules.CreateInfoPanel(square,scene,"--Cuadrado-- \n Un Cuadrado tiene 4 lados.",false);
+  Modules.CreateInfoPanel(triangle,scene,"--Triangulo-- \n Un Triangulo tiene 3 lados.",false);
+  Modules.CreateInfoPanel(circle,scene,"--Circulo-- \n Un Circulo sólo tiene un lado. ",false);
+
+  Modules.CreateInfoPanel(lock,scene,"¿Qué forma tiene esta habitación?",false,true);
+
+
+
+  //Set PressAnimations 
+
+
+ 
+
+  Modules.MakePressProccess(squareL,scene);
+  Modules.MakePressProccess(circleL,scene);
+  Modules.MakePressProccess(triangleL,scene);
+
+
 
   // Debug layer
   scene.debugLayer.show();

@@ -5,39 +5,109 @@ import * as BABYLON from "babylonjs";
 import earcut from "earcut";
 import * as GUI from "babylonjs-gui";
 import ammo from "ammo.js";
-
-export async function CreatePyramid(){
-
-    const {meshes} = await SceneLoader.ImportMeshAsync("Pyramid",Figures,"");
-
-    return meshes[1];
-
-}
+import buttonSound from "../Models/buttonSound128kbs.mp3";
 
 export async function CreateEnviroment(){
 
     const {meshes} = await SceneLoader.ImportMeshAsync("",Enviroment,"");
 
+    meshes.map((mesh) => {
+        mesh.checkCollisions = true;
+    })
+
     return meshes;
 }
 
-
-export async function CreateCube(){
-
-    const {meshes} = await SceneLoader.ImportMeshAsync("Cube",Figures,"");
+export function MakePressProccess(mesh, scene, id){
+    mesh.actionManager = new BABYLON.ActionManager(scene);
 
 
+    mesh.edgesWidth = 1.0;
+    mesh.edgesColor = new BABYLON.Color4(0, 0, 0, 1);   
     
+    let frameRate = setPressAnimation(mesh, id)
 
-    return meshes[1];
+
+    mesh.actionManager.registerAction(new BABYLON.PlaySoundAction(
+        BABYLON.ActionManager.OnPickDownTrigger,new BABYLON.Sound("down" + id, buttonSound, scene)));
+
+    mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnLeftPickTrigger,
+        function (evt) {
+            // This code will be executed when the mesh is clicked
+            console.log("Mesh clicked!"  + id);
+            scene.beginAnimation(mesh, 0,frameRate);
+
+            
+        }
+    ));
+
+    mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnPointerOverTrigger,
+        function (evt) {
+
+            mesh.enableEdgesRendering();
+        }
+    ));
+
+    mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnPointerOutTrigger,
+        function (evt) {
+       
+            mesh.disableEdgesRendering();
+
+
+        }
+    ));
+
+
 
 }
 
+function setPressAnimation(mesh,id){
+    const frameRate = 2;
+    
+    const keyFrames = [];
 
-export function CreateAnimation(mesh, scene){
+    let initialPos = mesh.position.x 
+
+
+    keyFrames.push({
+        frame: 0,
+        value: initialPos // Starting rotation
+    });
+    keyFrames.push({
+        frame: frameRate/2, // Duration of animation (in frames)
+        value: initialPos-.005 // Ending rotation
+    });
+
+    keyFrames.push({
+        frame: frameRate, // Duration of animation (in frames)
+        value: initialPos // Ending rotation
+    });
+
+
+    const pressAnimation = new BABYLON.Animation(
+        "pressAnimation"+id,
+        "position.x",
+        16, // Frames per second
+        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT  
+    );
+
+    pressAnimation.setKeys(keyFrames);
+
+
+    mesh.animations.push(pressAnimation);
+
+    return frameRate;
+} 
+
+
+
+export function MakeRotationAnimation(mesh, scene){
 
     const frameRate = 10;
-    // Define the rotation axis and angle
     const rotationAxis = new BABYLON.Vector3(0, 1, 1);
     const rotationAngle = Math.PI; // 90 degrees
     
@@ -111,9 +181,6 @@ export async function SetupScene(scene){
     
     new HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 
-    
-            
-
     const frameRate = 60;
     const gravity = -9.81;
     scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin(true,await ammo()));
@@ -122,69 +189,73 @@ export async function SetupScene(scene){
 
 }
 
-export async function CreateBoard(){
 
-    const {meshes} = await SceneLoader.ImportMeshAsync("Board",Figures,"");
-    return meshes[1];
-
-}
 /**
  *
  * 
  * @param {Scene} scene string name of the instanced material 
  */
 export function CreateController(scene){
-    const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1.7, 0), scene);
+    const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1, 0), scene);
     camera.attachControl();
     camera.checkCollisions = true;
-    //camera.applyGravity = true;
-    camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
-    camera.speed = 0.5;
+    camera.applyGravity = true;
+    camera.ellipsoid = new BABYLON.Vector3(.5, .5, .5);
+    camera.speed = 0.1;
     camera.minZ = 0.45;
     camera.angularSensibility = 4000;
 }
 
 /**
  *
- * @param {Mesh} mesh string name of the instanced material
- * @param {Scene} scene string name of the instanced material 
- * @param {string} panelText string name of the instanced material
- * @param {boolean} imported string name of the instanced material
+ * @param {Mesh} mesh The mesh 
+ * @param {Scene} scene Reference to the active scene
+ * @param {string} panelText String of the text to be displayed
+ * @param {boolean} billboardAll If the mesh is to be billboarded
  */
-export function CreateFloatingPanel(mesh,scene, panelText, imported){
+export function CreateInfoPanel(mesh,scene, panelText, billboardAll, rotation){
     // GUI
   let meshGUI = BABYLON.MeshBuilder.CreatePlane(
     "plane",
     {
-      width: 1 * 1.8,
-      height: 1,
+      width: 1,
+      height: .5,
       sideOrientation: BABYLON.Mesh.DOUBLESIDE,
     },
     scene
   );
 
-  meshGUI.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+  //
   let advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(meshGUI);
 
-  let button = GUI.Button.CreateSimpleButton("but1", panelText);
-  button.color = "white";
-  button.fontSize = 20;
-  button.background = "green";
-  button.onPointerEnterObservable.add(function () {
+  let button = GUI.Button.CreateSimpleButton("button1", panelText);
+  button.color = "blue";
+  button.fontSize = 26;
+  button.background = "white";
+  button.thickness = 0;
+
+  button.onPointerClickObservable.add(function () {
     console.log("click");
-  });
+    });
 
   advancedTexture.addControl(button);
   advancedTexture.scaleTo(300, 150);
 
 
   meshGUI.parent =  mesh;
-  meshGUI.position = new BABYLON.Vector3(0, -2, 0);
+  meshGUI.position = new BABYLON.Vector3(0, 1, 0);
 
-    if(imported){
+    if(billboardAll){
         
         let angle = 90;
         meshGUI.rotation = new BABYLON.Vector3(angle*Math.PI / 2, 0, 0);
+        meshGUI.position = new BABYLON.Vector3(0, -1, 0);
+        meshGUI.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    }
+
+    if(rotation){
+        meshGUI.rotate(BABYLON.Axis.Y, Math.PI/2, BABYLON.Space.WORLD);
+        
     }
 
     
