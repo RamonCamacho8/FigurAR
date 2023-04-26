@@ -63,7 +63,7 @@ export function MakePressProccess(mesh, scene, doorMesh){
     ));
 }
 
-function doorAnimation(meshs,scene){
+function doorAnimation(mesh,scene){
     const frameRate = 10;
     const rotationAxis = new BABYLON.Vector3(0, 1, 1);
     const rotationAngle = Math.PI; // 90 degrees
@@ -204,7 +204,7 @@ export function CreateController(scene){
     const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1, 0), scene);
     camera.attachControl();
     camera.checkCollisions = true;
-    camera.applyGravity = false;
+    camera.applyGravity = true;
     camera.ellipsoid = new BABYLON.Vector3(.25, .5, .25);
     camera.speed = 0.1;
     camera.minZ = 0.45;

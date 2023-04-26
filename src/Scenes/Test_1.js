@@ -53,7 +53,7 @@ const onSceneReady = async (
   
 
   light.position = lightBulb.position-.5;
-  lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+ 
   
   //roof.dispose();
 
