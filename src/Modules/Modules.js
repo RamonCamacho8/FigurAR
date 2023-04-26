@@ -201,6 +201,7 @@ export async function SetupScene(scene){
  * @param {Scene} scene string name of the instanced material 
  */
 export function CreateController(scene){
+
     const camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 1, 0), scene);
     camera.attachControl();
     camera.checkCollisions = true;
@@ -209,6 +210,8 @@ export function CreateController(scene){
     camera.speed = 0.1;
     camera.minZ = 0.45;
     camera.angularSensibility = 4000;
+
+    return camera;
 }
 
 /**
