@@ -2,7 +2,7 @@ import * as BABYLON from "babylonjs";
 import SceneComponent from "../Babylon_components/SceneComponent";
 import * as Modules from "../Modules/Modules";
 
-import { GizmoInterface } from "../Modules/GizmoInterface";
+
 import "babylonjs-loaders";
 
 const onSceneReady = async (
