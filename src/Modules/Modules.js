@@ -1,5 +1,8 @@
 import { HemisphericLight, Scene, SceneLoader } from "babylonjs";
 import Figures from "../Models/Figures.glb";
+import Room_1 from "../Models/Room_1.glb";
+import Room_2 from "../Models/Room_2.glb";
+import Room_3 from "../Models/Room_3.glb";
 import Enviroment from "../Models/FigurarEnviroment.glb";
 import * as BABYLON from "babylonjs";
 import earcut from "earcut";
@@ -7,21 +10,105 @@ import * as GUI from "babylonjs-gui";
 import ammo from "ammo.js";
 import buttonSound from "../Models/buttonSound128kbs.mp3";
 
-export async function CreateEnviroment(){
+export async function CreateEnviroment(scene){
 
-    const {meshes} = await SceneLoader.ImportMeshAsync("",Enviroment,"");
+    await createRoom_1(scene);
+    await createRoom_2(scene);
+    await createRoom_3(scene);
+    
+}
+
+ async function createRoom_1(scene){
+    const {meshes, animationGroups} = await SceneLoader.ImportMeshAsync("",Room_1,"",scene);
+    animationGroups[0].stop();
+
+    console.log(animationGroups);
+    
+    meshes.map((mesh) => {
+        mesh.checkCollisions = true;
+    })
+
+    //Lights
+    let light = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(0, 0, 0), scene);
+    //const shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
+    const gl = new BABYLON.GlowLayer("glow", scene);
+    light.intensity = 4
+
+    const squareL = scene.getMeshByName("Room_1_Square_L");
+    const circleL = scene.getMeshByName("Room_1_Circle_L");
+    const triangleL = scene.getMeshByName("Room_1_Triangle_L");
+    const lock = scene.getMeshByName("Room_1_Locker");
+    let door = scene.getMeshByName("Room_1_Door");
+    const roof = scene.getMeshByName("Room_1_Roof");
+    const lightBulb = scene.getMeshByName("Room_1_LightBulb_Part2");
+
+     //Set PressAnimations 
+    MakePressProccess(squareL,scene, door,animationGroups[0]);
+    MakePressProccess(circleL,scene);
+    MakePressProccess(triangleL,scene);
+
+    //
+    light.position = lightBulb.position.clone();
+    light.position.y -= .3;
+
+    lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+
+    return meshes;
+}
+
+async function createRoom_2(scene){
+    const {meshes} = await SceneLoader.ImportMeshAsync("",Room_2,"",scene);
+
+    let light = new BABYLON.PointLight("pointLight_1_Room_2", new BABYLON.Vector3(0, 0, 0), scene);
+    let light_2 = new BABYLON.PointLight("pointLight_2_Room_2", new BABYLON.Vector3(0, 0, 0), scene);
+    let lightBulb = scene.getMeshByName("Room_2_LightBulb_1_Part2");
+    let lightBulb_2 = scene.getMeshByName("Room_2_LightBulb_2_Part2");
+    const gl = new BABYLON.GlowLayer("glow_Room_2", scene);
+    light.intensity = 4
+    light_2.intensity = 4
+
+    light.position = lightBulb.position.clone();
+    light.position.y -= .3;
+
+    light_2.position = lightBulb_2.position.clone();
+    light_2.position.y -= .3;
+
+    lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+    lightBulb_2.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
 
     meshes.map((mesh) => {
         mesh.checkCollisions = true;
     })
 
+
+
     return meshes;
+
 }
 
-export function MakePressProccess(mesh, scene, doorMesh){
+async function createRoom_3(scene){
+    const {meshes} = await SceneLoader.ImportMeshAsync("",Room_3,"",scene);
+
+    meshes.map((mesh) => {
+        mesh.checkCollisions = true;
+    })
+    const gl = new BABYLON.GlowLayer("glow_Room_3", scene);
+    let light = new BABYLON.PointLight("pointLight_Room_3", new BABYLON.Vector3(0, 0, 0), scene);
+    const lightBulb = scene.getMeshByName("Room_3_LightBulb_Part2");
+    light.intensity = 4
+
+    light.position = lightBulb.position.clone();
+    light.position.y -= .3;
+
+    lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+    return meshes;
+
+}
+
+
+
+export function MakePressProccess(mesh, scene, doorMesh, animation){
     mesh.actionManager = new BABYLON.ActionManager(scene);
-
-
     mesh.edgesWidth = 1.0;
     mesh.edgesColor = new BABYLON.Color4(0, 0, 0, 1);   
     
@@ -38,8 +125,8 @@ export function MakePressProccess(mesh, scene, doorMesh){
             console.log(mesh.name)
             if(doorMesh){
                 console.log("Correcto"+doorMesh.name);
-                doorMesh.isVisible = false;
-                doorMesh.checkCollisions = false;
+                animation.play();
+                
             }
         }
     ));
