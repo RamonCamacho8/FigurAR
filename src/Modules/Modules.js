@@ -24,7 +24,7 @@ export async function CreateEnviroment(scene){
  */
 export async function SetupScene(scene){
     
-    let ambientLight = new HemisphericLight("light1", new BABYLON.Vector3(0, 2, 0), scene);
+    let ambientLight = new HemisphericLight("ambientLight", new BABYLON.Vector3(0, 2, 0), scene);
     ambientLight.intensity = 0.5;
     
 
