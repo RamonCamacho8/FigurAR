@@ -18,6 +18,26 @@ export async function CreateEnviroment(scene){
     
 }
 
+/**
+ * 
+ * @param {Scene} scene Scene
+ */
+export async function SetupScene(scene){
+    
+    let ambientLight = new HemisphericLight("light1", new BABYLON.Vector3(0, 2, 0), scene);
+    ambientLight.intensity = 0.5;
+    
+
+
+
+    const frameRate = 60;
+    const gravity = -9.81;
+    scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin(true,await ammo()));
+    scene.gravity = new BABYLON.Vector3(0, -0.98, 0)
+    scene.collitionsEnabled = true;
+
+}
+
  async function createRoom_1(scene){
     const {meshes, animationGroups} = await SceneLoader.ImportMeshAsync("",Room_1,"",scene);
     animationGroups[0].stop();
@@ -28,11 +48,8 @@ export async function CreateEnviroment(scene){
         mesh.checkCollisions = true;
     })
 
-    //Lights
-    let light = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(0, 0, 0), scene);
-    //const shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
-    const gl = new BABYLON.GlowLayer("glow", scene);
-    light.intensity = 4
+    //const gl = new BABYLON.GlowLayer("glow", scene);
+  
 
     const squareL = scene.getMeshByName("Room_1_Square_L");
     const circleL = scene.getMeshByName("Room_1_Circle_L");
@@ -43,13 +60,10 @@ export async function CreateEnviroment(scene){
     const lightBulb = scene.getMeshByName("Room_1_LightBulb_Part2");
 
      //Set PressAnimations 
-    MakePressProccess(squareL,scene, door,animationGroups[0]);
-    MakePressProccess(circleL,scene);
-    MakePressProccess(triangleL,scene);
+    OpenDoorProcess(squareL,scene, door,animationGroups[0]);
+    OpenDoorProcess(circleL,scene);
+    OpenDoorProcess(triangleL,scene);
 
-    //
-    light.position = lightBulb.position.clone();
-    light.position.y -= .3;
 
     lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
 
@@ -59,19 +73,11 @@ export async function CreateEnviroment(scene){
 async function createRoom_2(scene){
     const {meshes} = await SceneLoader.ImportMeshAsync("",Room_2,"",scene);
 
-    let light = new BABYLON.PointLight("pointLight_1_Room_2", new BABYLON.Vector3(0, 0, 0), scene);
-    let light_2 = new BABYLON.PointLight("pointLight_2_Room_2", new BABYLON.Vector3(0, 0, 0), scene);
+   
     let lightBulb = scene.getMeshByName("Room_2_LightBulb_1_Part2");
     let lightBulb_2 = scene.getMeshByName("Room_2_LightBulb_2_Part2");
-    const gl = new BABYLON.GlowLayer("glow_Room_2", scene);
-    light.intensity = 4
-    light_2.intensity = 4
-
-    light.position = lightBulb.position.clone();
-    light.position.y -= .3;
-
-    light_2.position = lightBulb_2.position.clone();
-    light_2.position.y -= .3;
+    //const gl = new BABYLON.GlowLayer("glow_Room_2", scene);
+  
 
     lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
     lightBulb_2.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
@@ -93,21 +99,14 @@ async function createRoom_3(scene){
         mesh.checkCollisions = true;
     })
     const gl = new BABYLON.GlowLayer("glow_Room_3", scene);
-    let light = new BABYLON.PointLight("pointLight_Room_3", new BABYLON.Vector3(0, 0, 0), scene);
     const lightBulb = scene.getMeshByName("Room_3_LightBulb_Part2");
-    light.intensity = 4
-
-    light.position = lightBulb.position.clone();
-    light.position.y -= .3;
-
+ 
     lightBulb.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
     return meshes;
 
 }
 
-
-
-export function MakePressProccess(mesh, scene, doorMesh, animation){
+export function OpenDoorProcess(mesh, scene, doorMesh, animation){
     mesh.actionManager = new BABYLON.ActionManager(scene);
     mesh.edgesWidth = 1.0;
     mesh.edgesColor = new BABYLON.Color4(0, 0, 0, 1);   
@@ -124,9 +123,7 @@ export function MakePressProccess(mesh, scene, doorMesh, animation){
             scene.beginAnimation(mesh, 0,frameRate);
             console.log(mesh.name)
             if(doorMesh){
-                console.log("Correcto"+doorMesh.name);
                 animation.play();
-                
             }
         }
     ));
@@ -148,43 +145,6 @@ export function MakePressProccess(mesh, scene, doorMesh, animation){
 
         }
     ));
-}
-
-function doorAnimation(mesh,scene){
-    const frameRate = 10;
-    const rotationAxis = new BABYLON.Vector3(0, 1, 1);
-    const rotationAngle = Math.PI; // 90 degrees
-    
-    const keyFrames = [];
-
-    keyFrames.push({
-        frame: 0,
-        value: mesh.rotationQuaternion.clone() // Starting rotation
-    });
-    keyFrames.push({
-        frame: frameRate, // Duration of animation (in frames)
-        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
-    });
-
-    keyFrames.push({
-        frame: frameRate*2, // Duration of animation (in frames)
-        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle*2).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
-    });
-
-    const rotateAnimation = new BABYLON.Animation(
-        "rotateAnimation",
-        "rotationQuaternion",
-        frameRate, // Frames per second
-        BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
-        BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE // Loop the animation
-    );
-
-    rotateAnimation.setKeys(keyFrames);
-
-
-    mesh.animations.push(rotateAnimation);
-
-    scene.beginAnimation(mesh, 0, 2 * frameRate, true);
 }
 
 function setPressAnimation(mesh,id){
@@ -228,59 +188,6 @@ function setPressAnimation(mesh,id){
 
 
 
-export function MakeRotationAnimation(mesh, scene){
-
-    const frameRate = 10;
-    const rotationAxis = new BABYLON.Vector3(0, 1, 1);
-    const rotationAngle = Math.PI; // 90 degrees
-    
-    const keyFrames = [];
-
-    keyFrames.push({
-        frame: 0,
-        value: mesh.rotationQuaternion.clone() // Starting rotation
-    });
-    keyFrames.push({
-        frame: frameRate, // Duration of animation (in frames)
-        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
-    });
-
-    keyFrames.push({
-        frame: frameRate*2, // Duration of animation (in frames)
-        value: BABYLON.Quaternion.RotationAxis(rotationAxis, rotationAngle*2).multiply(mesh.rotationQuaternion.clone()) // Ending rotation
-    });
-
-    const rotateAnimation = new BABYLON.Animation(
-        "rotateAnimation",
-        "rotationQuaternion",
-        frameRate, // Frames per second
-        BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
-        BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE // Loop the animation
-    );
-
-    rotateAnimation.setKeys(keyFrames);
-
-
-    mesh.animations.push(rotateAnimation);
-
-    scene.beginAnimation(mesh, 0, 2 * frameRate, true);
-}
-
-/**
- * 
- * @param {Scene} scene Scene
- */
-export async function SetupScene(scene){
-    
-    //new HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-
-    const frameRate = 60;
-    const gravity = -9.81;
-    scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin(true,await ammo()));
-    scene.gravity = new BABYLON.Vector3(0, -0.98, 0)
-    scene.collitionsEnabled = true;
-
-}
 
 /**
  *
