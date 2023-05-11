@@ -21,10 +21,10 @@ const onSceneReady = async (
 
 
   // Setup scene
-  Modules.SetupScene(scene);
+  Modules.SetupScene(scene, canvas);
 
   
-  Modules.CreateController(scene);
+
   await Modules.CreateEnviroment(scene);
 
   // Debug layer
