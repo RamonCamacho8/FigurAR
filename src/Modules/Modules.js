@@ -1,5 +1,5 @@
 import { HemisphericLight, Scene, SceneLoader } from "babylonjs";
-import Figures from "../Models/Figures.glb";
+import * as XR from "../Modules/XR_Module";
 import Player from "../Models/Player.glb";
 import Room_1 from "../Models/Room_1.glb";
 import Room_2 from "../Models/Room_2.glb";
@@ -26,7 +26,8 @@ export async function CreateEnviroment(scene){
  */
 export async function SetupScene(scene, canvas){
     
-    CreateController(scene, canvas)
+    CreatePlayerController(scene, canvas)
+    XR.XR_Experience(scene);
 
     let ambientLight = new HemisphericLight("ambientLight", new BABYLON.Vector3(0, 2, 0), scene);
     ambientLight.intensity = 0.5;
@@ -40,7 +41,7 @@ export async function SetupScene(scene, canvas){
 
 }
 
-async function CreateController(scene ,canvas){
+async function CreatePlayerController(scene ,canvas){
 
     const firstPersonCamera = new BABYLON.FreeCamera("firstPersonCamera", new BABYLON.Vector3(0, 1, 0), scene);
     firstPersonCamera.attachControl(canvas, true);
@@ -98,10 +99,10 @@ async function CreateController(scene ,canvas){
     
     colliderMesh.checkCollisions = false;
     colliderMesh.isPickable = false;
-    //colliderMesh.isVisible = false;
+    colliderMesh.isVisible = false;
 
 
-    detectTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
+    roomEnterTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
     
 
   
@@ -130,9 +131,9 @@ async function createRoom_2(scene){
 
     colliderMesh.checkCollisions = false;
     colliderMesh.isPickable = false;
-    //colliderMesh.isVisible = false;
+    colliderMesh.isVisible = false;
 
-    detectTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
+    roomEnterTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
     return meshes;
 
 }
@@ -152,9 +153,9 @@ async function createRoom_3(scene){
 
     colliderMesh.checkCollisions = false;
     colliderMesh.isPickable = false;
-    //colliderMesh.isVisible = false;
+    colliderMesh.isVisible = false;
 
-    detectTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
+    roomEnterTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
     return meshes;
 
 }
@@ -174,8 +175,9 @@ async function createRoom_4(scene){
 
     colliderMesh.checkCollisions = false;
     colliderMesh.isPickable = false;
+    colliderMesh.isVisible = false;
 
-    detectTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
+    roomEnterTrigger(colliderMesh, scene.getMeshByName("Player"), scene);
 
     door.dispose();
 
@@ -189,12 +191,13 @@ async function createRoom_4(scene){
  * @param {Mesh} colliderMesh
  */
 
-function detectTrigger(colliderMesh, collitionerObject, scene){
+function roomEnterTrigger(colliderMesh, collitionerObject, scene){
 
     colliderMesh.visibility = .5;
     let material = new BABYLON.StandardMaterial("material", scene);
     material.diffuseColor = BABYLON.Color3.Red();
     colliderMesh.material = material;
+    
 
     let showedHUD = false;
 

@@ -28,7 +28,7 @@ const onSceneReady = async (
   await Modules.CreateEnviroment(scene);
 
   // Debug layer
-  scene.debugLayer.show();
+  //scene.debugLayer.show();
 
 
   scene.onBeforeRenderObservable.add(() =>{

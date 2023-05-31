@@ -8,24 +8,24 @@ import * as GUI from "babylonjs-gui";
    * @param {BABYLON.Scene} scene the instanced babylon js scene.
    * @returns the promised XR default experience instance.
    */
-export async function XR_Experience(ground, skybox, scene) {
+export async function XR_Experience(scene) {
 
 
     let inmersive_state = "inline";
     let reference_floor = "local-floor"
 
-    let avaliableVR = await BABYLON.WebXRSessionManager.IsSessionSupportedAsync("immersive-vr");
-    let avaliableAR = await BABYLON.WebXRSessionManager.IsSessionSupportedAsync("immersive-ar");
+    let availableVR = await BABYLON.WebXRSessionManager.IsSessionSupportedAsync("immersive-vr");
+    let availableAR = await BABYLON.WebXRSessionManager.IsSessionSupportedAsync("immersive-ar");
 
 
-    console.log("AR mode avaliable: " + avaliableAR);
-    console.log("VR mode avaliable: " + avaliableVR);
+    console.log("AR mode avaliable: " + availableAR);
+    console.log("VR mode avaliable: " + availableVR);
 
-    if (avaliableVR) {
+    if (availableVR) {
 
         inmersive_state = "immersive-vr";
 
-        if (avaliableAR) {
+        if (availableAR) {
 
             inmersive_state = "immersive-ar";
 
@@ -39,7 +39,7 @@ export async function XR_Experience(ground, skybox, scene) {
         disablePointerSelection: false,
         disableTeleportation: true,
 
-        floorMeshes: [ground],
+        //floorMeshes: [ground],
 
         uiOptions: {
             sessionMode: inmersive_state,
@@ -60,7 +60,7 @@ export async function XR_Experience(ground, skybox, scene) {
 
         xrExperience.baseExperience.onStateChangedObservable.add((XRstate) => {
 
-            if (avaliableVR) {
+            if (availableVR) {
 
 
 
@@ -82,7 +82,7 @@ export async function XR_Experience(ground, skybox, scene) {
             }
 
 
-            if (avaliableAR) {
+            if (availableAR) {
 
                 switch (XRstate) {
                     case BABYLON.WebXRState.IN_XR:
@@ -90,24 +90,13 @@ export async function XR_Experience(ground, skybox, scene) {
                         break
                     case BABYLON.WebXRState.ENTERING_XR:
                         // xr is being initialized, enter XR request was made
-                        if (ground) {
-                            ground.visibility = 0;
-                        }
-                        if (skybox) {
-                            skybox.isVisible = false;
-                        }
+            
                         break
                     case BABYLON.WebXRState.EXITING_XR:
                         // xr exit request was made. not yet done.
                         break
                     case BABYLON.WebXRState.NOT_IN_XR:
                         // self explanatory - either out or not yet in XR
-                        if (ground) {
-                            ground.visibility = 1;
-                        }
-                        if (skybox) {
-                            skybox.isVisible = true;
-                        }
                         break
                 }
 
